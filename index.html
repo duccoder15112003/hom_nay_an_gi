@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="vi" data-type="software">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="page-type" content="software">
+  <meta name="site-kind" content="gaming">
+  <meta name="description" content="Hòm Ăn Gì - Mở hòm ẩm thực Việt phong cách CS:GO, chọn nơi ở, định vị quán ngon 5 sao trên Google Maps và đặt món ngay trên GrabFood.">
+  <meta name="theme-color" content="#0b0e14">
+  <title>Hòm Ăn Gì • Mở Hòm Ẩm Thực Việt Phong Cách CS:GO</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Be Vietnam Pro (Vietnamese subset) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Favicon SVG -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍲</text></svg>">
+
+  <!-- CSS chính -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Scripts: Chạy độc lập qua file://, không module, không fetch JSON -->
+  <script defer src="js/data.js"></script>
+  <script defer src="js/engine.js"></script>
+  <script defer src="js/audio.js"></script>
+  <script defer src="js/reel.js"></script>
+  <script defer src="js/share.js"></script>
+  <script defer src="js/app.js"></script>
+</head>
+<body>
+  <!-- Header thanh điều hướng -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-badge-icon" aria-hidden="true">
+          <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+            <rect x="3" y="10" width="26" height="17" rx="3.5" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+            <path d="M3 14 L29 14" stroke="#f59e0b" stroke-width="1.5"/>
+            <rect x="11" y="6" width="10" height="4" rx="1.5" fill="#334155" stroke="#f59e0b" stroke-width="1.5"/>
+            <circle cx="16" cy="20" r="3" fill="#f59e0b"/>
+            <path d="M9 10 L12 14 M23 10 L20 14" stroke="#f59e0b" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">HÒM ĂN GÌ</span>
+          <span class="brand-tag">MIL-SPEC // CS:GO VIỆT NAM</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <!-- Nút chọn nơi ở -->
+        <button id="btn-location-picker" class="btn-location" aria-label="Chọn nơi ở hiện tại" title="Bấm để đổi thành phố hoặc quận/huyện">
+          <span class="loc-radar-dot" aria-hidden="true"></span>
+          <span id="current-location-text" class="loc-text">TP.HCM • Quận 1</span>
+          <span class="loc-arrow" aria-hidden="true">▾</span>
+        </button>
+      </div>
+
+      <nav class="header-actions" aria-label="Menu chức năng">
+        <button id="btn-sound-toggle" class="btn-icon" aria-label="Bật/Tắt âm thanh" title="Bật/Tắt âm thanh">
+          <span class="icon-sound" aria-hidden="true">🔊</span>
+        </button>
+
+        <button id="btn-case-content" class="btn-subtle" title="Xem danh sách món trong hòm">
+          <span class="btn-icon-sub" aria-hidden="true">🔍</span>
+          <span class="btn-text">Trong hòm có gì?</span>
+        </button>
+
+        <button id="btn-history" class="btn-subtle" title="Lịch sử mở hòm">
+          <span class="btn-icon-sub" aria-hidden="true">📜</span>
+          <span class="btn-text">Lịch sử</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Màn hình chính -->
+  <main class="app-main">
+    <div class="tactical-arena">
+      <!-- Tiêu đề Hero & Radar Vị trí -->
+      <div class="hero-block">
+        <div class="location-badge-hint" id="location-hint-pill">
+          <span class="pulse-green-dot"></span>
+          <span>RADAR TÌM QUÁN: <strong id="hero-location-text">Quận 1, TP.HCM</strong></span>
+        </div>
+        <h1 class="hero-title">HÔM NAY ĂN GÌ?</h1>
+        <p class="hero-tagline">Mở hòm ẩm thực đường phố Việt Nam phong cách CS:GO • Định vị quán 5 sao Google Maps & Đặt Grab liền tay</p>
+      </div>
+
+      <!-- SÂN KHẤU HÒM 3D (CS:GO WEAPON CASE OPENING BAY) -->
+      <div class="crate-inspection-bay">
+        <!-- Vòng sáng tâm chiếu từ trên xuống (Volumetric Spotlight) -->
+        <div class="crate-spotlight" aria-hidden="true"></div>
+
+        <div id="crate-showcase" class="crate-3d-box" role="button" aria-label="Bấm vào đây hoặc nút bên dưới để mở hòm" tabindex="0">
+          <!-- Hào quang lõi năng lượng phát sáng -->
+          <div class="crate-glow" aria-hidden="true"></div>
+
+          <!-- SVG HÒM VŨ KHÍ CƠ KHÍ CS:GO NÂNG CẤP CAO ĐỘ (540x340) -->
+          <svg class="crate-svg" viewBox="0 0 540 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Kim loại thân hòm -->
+              <linearGradient id="crateBaseMetal" x1="0" y1="0" x2="0" y2="100%">
+                <stop offset="0%" stop-color="#334155"/>
+                <stop offset="40%" stop-color="#1e293b"/>
+                <stop offset="100%" stop-color="#0f172a"/>
+              </linearGradient>
+
+              <!-- Mặt ốp carbon trung tâm -->
+              <linearGradient id="crateFrontPlate" x1="0" y1="0" x2="0" y2="100%">
+                <stop offset="0%" stop-color="#1e293b"/>
+                <stop offset="100%" stop-color="#090d16"/>
+              </linearGradient>
+
+              <!-- Kim loại nắp hòm -->
+              <linearGradient id="crateLidMetal" x1="0" y1="0" x2="0" y2="100%">
+                <stop offset="0%" stop-color="#475569"/>
+                <stop offset="50%" stop-color="#334155"/>
+                <stop offset="100%" stop-color="#1e293b"/>
+              </linearGradient>
+
+              <!-- Viền vát cạnh bóng kim loại -->
+              <linearGradient id="bevelHighlight" x1="0" y1="0" x2="100%" y2="0">
+                <stop offset="0%" stop-color="#64748b"/>
+                <stop offset="50%" stop-color="#94a3b8"/>
+                <stop offset="100%" stop-color="#475569"/>
+              </linearGradient>
+
+              <!-- Lõi năng lượng vàng cam rực cháy -->
+              <radialGradient id="amberCoreGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fef08a"/>
+                <stop offset="35%" stop-color="#f59e0b"/>
+                <stop offset="75%" stop-color="#b45309"/>
+                <stop offset="100%" stop-color="#78350f"/>
+              </radialGradient>
+
+              <!-- Hoa văn sọc Hazard CS:GO -->
+              <pattern id="hazardStripes" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <rect width="14" height="28" fill="#f59e0b"/>
+                <rect x="14" width="14" height="28" fill="#0f172a"/>
+              </pattern>
+
+              <!-- Filter phát sáng neon -->
+              <filter id="neonAmberGlow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="8" result="blur"/>
+                <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+              </filter>
+              <filter id="pedestalBlur" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="12"/>
+              </filter>
+            </defs>
+
+            <!-- 1. BỆ ĐỠ HOLOGRAPHIC DƯỚI ĐÁY (PEDESTAL & SHADOW) -->
+            <g id="crate-pedestal-group">
+              <!-- Bóng tiếp đất mờ đậm -->
+              <ellipse cx="270" cy="290" rx="190" ry="30" fill="#000000" opacity="0.8" filter="url(#pedestalBlur)"/>
+              
+              <!-- Vòng quét Holographic Cyber màu vàng & xanh -->
+              <ellipse cx="270" cy="285" rx="220" ry="34" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="12 6" opacity="0.6"/>
+              <ellipse cx="270" cy="285" rx="165" ry="24" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="6 8" opacity="0.5"/>
+              <ellipse cx="270" cy="285" rx="100" ry="15" fill="rgba(245, 158, 11, 0.22)" filter="url(#neonAmberGlow)"/>
+              
+              <!-- Tọa độ radar quân sự -->
+              <line x1="45" y1="285" x2="65" y2="285" stroke="#f59e0b" stroke-width="2" opacity="0.7"/>
+              <line x1="475" y1="285" x2="495" y2="285" stroke="#f59e0b" stroke-width="2" opacity="0.7"/>
+            </g>
+
+            <!-- 2. THÂN HÒM CHÍNH (CRATE BODY GROUP) -->
+            <g id="crate-body-group">
+              <!-- Khung vỏ thép bọc giáp bên ngoài -->
+              <rect x="65" y="115" width="410" height="162" rx="16" fill="url(#crateBaseMetal)" stroke="#475569" stroke-width="3"/>
+              
+              <!-- Mặt lõm ốp carbon trung tâm -->
+              <rect x="85" y="130" width="370" height="132" rx="10" fill="url(#crateFrontPlate)" stroke="#1e293b" stroke-width="2"/>
+
+              <!-- Hai dải sọc Hazard CS:GO cảnh báo nguy hiểm trên và dưới -->
+              <rect x="135" y="136" width="270" height="14" rx="3" fill="url(#hazardStripes)" stroke="#1e293b" stroke-width="1.5" opacity="0.9"/>
+              <rect x="135" y="242" width="270" height="14" rx="3" fill="url(#hazardStripes)" stroke="#1e293b" stroke-width="1.5" opacity="0.9"/>
+
+              <!-- 4 Góc bọc thép gia cố có ốc vít lục giác (Heavy Armored Corner Brackets) -->
+              <!-- Góc trên trái -->
+              <path d="M65 115 L125 115 L125 142 L92 142 L65 168 Z" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+              <circle cx="82" cy="130" r="3.5" fill="#94a3b8"/>
+              <circle cx="108" cy="128" r="3.5" fill="#94a3b8"/>
+
+              <!-- Góc trên phải -->
+              <path d="M475 115 L415 115 L415 142 L448 142 L475 168 Z" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+              <circle cx="458" cy="130" r="3.5" fill="#94a3b8"/>
+              <circle cx="432" cy="128" r="3.5" fill="#94a3b8"/>
+
+              <!-- Góc dưới trái -->
+              <path d="M65 277 L125 277 L125 250 L92 250 L65 224 Z" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+              <circle cx="82" cy="262" r="3.5" fill="#94a3b8"/>
+              <circle cx="108" cy="264" r="3.5" fill="#94a3b8"/>
+
+              <!-- Góc dưới phải -->
+              <path d="M475 277 L415 277 L415 250 L448 250 L475 224 Z" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+              <circle cx="458" cy="262" r="3.5" fill="#94a3b8"/>
+              <circle cx="432" cy="264" r="3.5" fill="#94a3b8"/>
+
+              <!-- Khe tản nhiệt tổ ong phát sáng cam bên trái & phải -->
+              <g opacity="0.85">
+                <rect x="94" y="172" width="24" height="4" rx="2" fill="#f97316" filter="url(#neonAmberGlow)"/>
+                <rect x="94" y="182" width="24" height="4" rx="2" fill="#f97316" filter="url(#neonAmberGlow)"/>
+                <rect x="94" y="192" width="24" height="4" rx="2" fill="#f97316" filter="url(#neonAmberGlow)"/>
+                <rect x="94" y="202" width="24" height="4" rx="2" fill="#f97316" filter="url(#neonAmberGlow)"/>
+
+                <rect x="422" y="172" width="24" height="4" rx="2" fill="#f97316" filter="url(#neonAmberGlow)"/>
+                <rect x="422" y="182" width="24" height="4" rx="2" fill="#f97316" filter="url(#neonAmberGlow)"/>
+                <rect x="422" y="192" width="24" height="4" rx="2" fill="#f97316" filter="url(#neonAmberGlow)"/>
+                <rect x="422" y="202" width="24" height="4" rx="2" fill="#f97316" filter="url(#neonAmberGlow)"/>
+              </g>
+
+              <!-- Piston trợ lực thủy lực 2 bên hông -->
+              <rect x="52" y="98" width="12" height="78" rx="4" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+              <rect x="476" y="98" width="12" height="78" rx="4" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+
+              <!-- KHÓA BẬT KIM LOẠI NẶNG TRÁI & PHẢI VỚI ĐÈN LED (HEAVY LATCHES) -->
+              <g id="crate-latches">
+                <!-- Khóa trái -->
+                <rect x="138" y="104" width="24" height="48" rx="4" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>
+                <rect x="144" y="112" width="12" height="14" rx="2" fill="#1e293b"/>
+                <circle cx="150" cy="140" r="3.5" fill="#22c55e" filter="url(#neonAmberGlow)"/>
+
+                <!-- Khóa phải -->
+                <rect x="378" y="104" width="24" height="48" rx="4" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>
+                <rect x="384" y="112" width="12" height="14" rx="2" fill="#1e293b"/>
+                <circle cx="390" cy="140" r="3.5" fill="#22c55e" filter="url(#neonAmberGlow)"/>
+              </g>
+
+              <!-- CỬA SỔ LÕI NĂNG LƯỢNG TRUNG TÂM (CENTRAL GLOWING APERTURE) -->
+              <g id="crate-central-core">
+                <!-- Vòng vát ngoài cùng -->
+                <circle cx="270" cy="192" r="46" fill="#111827" stroke="#f59e0b" stroke-width="3.5" filter="url(#neonAmberGlow)"/>
+                
+                <!-- Vòng quang năng nội bộ -->
+                <circle cx="270" cy="192" r="36" fill="url(#amberCoreGrad)"/>
+                
+                <!-- Biểu tượng bát phở kim loại vàng phát sáng hào quang -->
+                <!-- Bát phở cách điệu -->
+                <path d="M250 196 C250 210 290 210 290 196 Z" fill="#ffffff" opacity="0.95"/>
+                <line x1="246" y1="195" x2="294" y2="195" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+                <!-- Luồng khói nghi ngút nóng hổi -->
+                <path d="M258 188 Q262 181 258 174 M270 188 Q274 179 270 171 M282 188 Q286 181 282 174" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.9"/>
+                
+                <!-- Tem chữ quân sự CS:GO -->
+                <text x="270" y="226" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="8" letter-spacing="2" fill="#fef08a" text-anchor="middle">SPEC-084 // CS:GO</text>
+                <text x="270" y="235" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="6.5" letter-spacing="1.5" fill="#cbd5e1" text-anchor="middle">STREET FOOD CRATE</text>
+              </g>
+            </g>
+
+            <!-- 3. NẮP HÒM BỌC THÉP VÁT CẠNH (CRATE LID GROUP) -->
+            <g id="crate-lid-group">
+              <!-- Nắp kim loại dày góc xiên -->
+              <path d="M50 82 L490 82 L476 117 L64 117 Z" fill="url(#crateLidMetal)" stroke="#64748b" stroke-width="3"/>
+              
+              <!-- Gờ dập nổi chống va đập trên đỉnh nắp -->
+              <rect x="90" y="85" width="360" height="6" rx="2" fill="#1e293b" opacity="0.7"/>
+
+              <!-- Tay cầm cơ khí quân dụng bằng thép tôi -->
+              <rect x="205" y="56" width="130" height="26" rx="6" fill="#1e293b" stroke="#94a3b8" stroke-width="2.5"/>
+              <line x1="250" y1="62" x2="250" y2="76" stroke="#475569" stroke-width="2"/>
+              <line x1="270" y1="62" x2="270" y2="76" stroke="#475569" stroke-width="2"/>
+              <line x1="290" y1="62" x2="290" y2="76" stroke="#475569" stroke-width="2"/>
+
+              <!-- Cụm ổ khóa điện tử trung tâm nắp -->
+              <rect x="246" y="100" width="48" height="30" rx="5" fill="#090d16" stroke="#f59e0b" stroke-width="2.5"/>
+              <circle cx="270" cy="115" r="5" fill="#f59e0b" filter="url(#neonAmberGlow)"/>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Thông số hòm vũ khí ẩm thực phong cách CS:GO -->
+        <div class="crate-specs-badge">
+          <span class="spec-code">CRATE ID: #084-VN</span>
+          <span class="spec-divider">•</span>
+          <span class="spec-status"><span class="status-dot"></span> SẴN SÀNG MỞ</span>
+          <span class="spec-divider">•</span>
+          <span class="spec-tier">6 TIERS // 221 MÓN VIỆT</span>
+        </div>
+      </div>
+
+      <!-- BẢNG ĐIỀU KHIỂN TÁC CHIẾN (TACTICAL CONTROL CONSOLE) -->
+      <div class="tactical-console">
+        <div class="console-grid">
+          <!-- Cột 1: Ô nhập ngân sách & Chips bấm nhanh -->
+          <div class="console-cell budget-cell">
+            <div class="cell-label-row">
+              <label for="budget-input" class="console-label">NGÂN SÁCH CỦA BẠN (VND):</label>
+              <span class="label-hint">Gõ tự do (vd: 45k, 120k, 1tr5)</span>
+            </div>
+
+            <div class="tactical-input-wrap">
+              <span class="currency-tag" aria-hidden="true">₫</span>
+              <input
+                type="text"
+                id="budget-input"
+                class="tactical-budget-input"
+                inputmode="numeric"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="45.000"
+                aria-describedby="budget-error"
+              >
+              <span class="currency-suffix-tag">VND</span>
+            </div>
+            <div id="budget-error" class="input-error-msg" role="alert" aria-live="polite"></div>
+
+            <!-- Các nút bấm nhanh ngân sách -->
+            <div class="tactical-chips" aria-label="Chọn nhanh mức ngân sách">
+              <button type="button" class="preset-btn" data-amount="30000">30k</button>
+              <button type="button" class="preset-btn" data-amount="50000">50k</button>
+              <button type="button" class="preset-btn" data-amount="100000">100k</button>
+              <button type="button" class="preset-btn" data-amount="200000">200k</button>
+              <button type="button" class="preset-btn" data-amount="500000">500k</button>
+            </div>
+          </div>
+
+          <!-- Cột 2: Thanh chuyển bữa ăn (Segmented Switch) -->
+          <div class="console-cell meal-cell">
+            <div class="cell-label-row">
+              <span class="console-label">CHỌN BỮA ĂN HÔM NAY:</span>
+              <span class="label-hint">Tự chọn theo giờ thực tế</span>
+            </div>
+
+            <div class="tactical-meal-bar" role="tablist" aria-label="Chọn bữa ăn">
+              <button type="button" class="meal-tab is-active" data-meal="tatca" role="tab" aria-selected="true">
+                Tất cả
+              </button>
+              <button type="button" class="meal-tab" data-meal="sang" role="tab" aria-selected="false">
+                Sáng
+              </button>
+              <button type="button" class="meal-tab" data-meal="trua" role="tab" aria-selected="false">
+                Trưa
+              </button>
+              <button type="button" class="meal-tab" data-meal="toi" role="tab" aria-selected="false">
+                Tối
+              </button>
+              <button type="button" class="meal-tab" data-meal="anvat" role="tab" aria-selected="false">
+                Ăn vặt
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- NÚT MỞ HÒM CHÍNH (TACTICAL BLAST LAUNCH BUTTON) -->
+        <div class="console-action-row">
+          <button id="btn-open-crate" class="btn-tactical-open" type="button">
+            <span class="btn-hazard-border" aria-hidden="true"></span>
+            <span class="btn-core-glow" aria-hidden="true"></span>
+            <span class="btn-inner-content">
+              <span class="btn-key-icon" aria-hidden="true">🔑</span>
+              <span class="btn-main-title">MỞ HÒM NGAY</span>
+              <span class="btn-key-badge">(ENTER)</span>
+            </span>
+          </button>
+
+          <p class="disclaimer-note">
+            <span class="info-icon" aria-hidden="true">💡</span> Giá món ăn mang tính tham khảo quán bình dân đến tầm trung.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= MODALS & DRAWERS ================= -->
+
+  <!-- 1. LOCATION MODAL (CHỌN NƠI Ở: THÀNH PHỐ & QUẬN/HUYỆN) -->
+  <div id="location-modal" class="location-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Chọn nơi ở của bạn">
+    <div class="location-modal-backdrop" id="location-backdrop"></div>
+    <div class="location-modal-dialog">
+      <div class="location-modal-header">
+        <div class="loc-modal-title-row">
+          <span class="loc-modal-icon">📍</span>
+          <div>
+            <h3 class="loc-modal-title">Chọn Nơi Ở Của Bạn</h3>
+            <span class="loc-modal-subtitle">Để lọc quán ngon 5 sao gần bạn nhất</span>
+          </div>
+        </div>
+        <button id="btn-close-location" class="btn-close-modal" aria-label="Đóng chọn nơi ở">✕</button>
+      </div>
+
+      <div class="location-modal-body">
+        <div class="loc-field">
+          <label for="select-city" class="loc-label">Thành phố:</label>
+          <select id="select-city" class="loc-select"></select>
+        </div>
+        <div class="loc-field">
+          <label for="select-district" class="loc-label">Quận / Huyện:</label>
+          <select id="select-district" class="loc-select"></select>
+        </div>
+
+        <button id="btn-save-location" class="btn-save-loc" type="button">
+          Xác Nhận Vị Trí
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. REEL STAGE MODAL (SÂN KHẤU CUỘN NGANG VỚI ẢNH MẠNG THỰC TẾ) -->
+  <div id="reel-modal" class="reel-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Đang mở hòm">
+    <div class="reel-modal-backdrop"></div>
+    <div class="reel-modal-body">
+      <!-- Tiêu đề Reel -->
+      <div class="reel-header">
+        <div class="reel-crate-tag">★ OPENING CASE • REAL FOOD REEL ★</div>
+        <button id="btn-skip-spin" class="btn-skip" type="button" aria-label="Bỏ qua hiệu ứng cuộn">
+          Bỏ qua &gt;&gt;
+        </button>
+      </div>
+
+      <!-- Khung Reel chính -->
+      <div id="reel-container" class="reel-container">
+        <!-- Vạch chỉ giữa (Center Needle) -->
+        <div id="reel-needle" class="reel-needle" aria-hidden="true">
+          <div class="needle-pointer-top"></div>
+          <div class="needle-line"></div>
+          <div class="needle-pointer-bottom"></div>
+        </div>
+
+        <!-- Hai đầu làm mờ (Fade masks) -->
+        <div class="reel-fade-left" aria-hidden="true"></div>
+        <div class="reel-fade-right" aria-hidden="true"></div>
+
+        <!-- Dải thẻ chuyển động -->
+        <div id="reel-track" class="reel-track" role="list"></div>
+      </div>
+
+      <div class="reel-footer-hint">
+        <span class="pulse-dot"></span> Đang lựa chọn món ăn trúng thưởng theo trọng số...
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. RESULT MODAL (THẺ KẾT QUẢ MÓN TRÚNG + TOP QUÁN 5 SAO GOOGLE MAPS & GRABFOOD) -->
+  <div id="result-modal" class="result-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Kết quả mở hòm">
+    <div class="result-modal-backdrop"></div>
+    <div class="result-modal-dialog">
+      <button id="btn-close-result" class="btn-close-modal" aria-label="Đóng kết quả">✕</button>
+
+      <div id="result-card-inner" class="result-card">
+        <!-- Ảnh món ăn thực tế cỡ lớn -->
+        <div class="result-hero-img-wrap">
+          <img id="result-photo" src="" alt="Món trúng thưởng" class="result-hero-img">
+          <div class="result-hero-gradient"></div>
+          <div class="result-badge-wrap">
+            <span id="result-tier-badge" class="result-tier-badge">TIER NAME</span>
+          </div>
+        </div>
+
+        <div class="result-content-body">
+          <!-- Tên món & Giá tiền -->
+          <h2 id="result-name" class="result-title">Tên món ăn</h2>
+          <div id="result-price" class="result-price">45.000đ</div>
+
+          <!-- Tags Bữa ăn & Vùng miền -->
+          <div class="result-tags">
+            <span id="result-region-tag" class="result-tag tag-region">Miền Bắc</span>
+            <span id="result-meal-tag" class="result-tag tag-meal">Bữa Trưa</span>
+          </div>
+
+          <!-- Mô tả dí dỏm gợi thèm -->
+          <p id="result-desc" class="result-description">
+            Hương vị thơm ngon khó cưỡng.
+          </p>
+
+          <!-- Dòng vui về tiền dư nếu còn -->
+          <div id="result-leftover" class="result-leftover"></div>
+
+          <!-- PHẦN GỢI Ý QUÁN ĂN 5 SAO (TÍCH HỢP MAPS & GRABFOOD) -->
+          <div class="restaurants-section">
+            <div class="restaurants-header">
+              <div class="restaurants-title-group">
+                <span class="restaurants-icon" aria-hidden="true">⭐</span>
+                <h3 class="restaurants-title">Quán Ngon Gợi Ý Gần Bạn</h3>
+                <span id="restaurants-loc-badge" class="restaurants-loc-badge">Quận 1</span>
+              </div>
+
+              <!-- Thanh lọc sao 5 sao giảm dần -->
+              <div class="star-filter-bar" role="group" aria-label="Lọc quán theo số sao">
+                <button type="button" class="star-btn is-active" data-stars="0">Tất cả</button>
+                <button type="button" class="star-btn" data-stars="5.0">5.0 ★</button>
+                <button type="button" class="star-btn" data-stars="4.8">4.8★+</button>
+                <button type="button" class="star-btn" data-stars="4.5">4.5★+</button>
+              </div>
+            </div>
+
+            <!-- Danh sách các quán ăn -->
+            <div id="result-restaurant-list" class="restaurant-cards-list">
+              <!-- Sẽ được JS render động -->
+            </div>
+          </div>
+
+          <!-- Các nút hành động sau khi mở -->
+          <div class="result-actions">
+            <button id="btn-reopen" class="btn-result btn-reopen" type="button">
+              <span>🔄</span> Mở Lại (Enter)
+            </button>
+            <button id="btn-share" class="btn-result btn-share" type="button">
+              <span>📸</span> Lưu ảnh / Chia sẻ
+            </button>
+            <button id="btn-change-budget" class="btn-result btn-secondary" type="button">
+              <span>✏️</span> Đổi ngân sách
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. LỊCH SỬ MỞ HÒM (HISTORY DRAWER) -->
+  <div id="history-backdrop" class="drawer-backdrop" aria-hidden="true"></div>
+  <aside id="history-drawer" class="drawer drawer-right" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Lịch sử mở hòm">
+    <div class="drawer-header">
+      <div class="drawer-title-row">
+        <span class="drawer-icon" aria-hidden="true">📜</span>
+        <h2 class="drawer-title">Lịch Sử Mở Hòm</h2>
+      </div>
+      <button id="btn-close-history" class="btn-close-drawer" aria-label="Đóng lịch sử">✕</button>
+    </div>
+
+    <!-- Thanh thống kê nhanh -->
+    <div class="drawer-stats">
+      <div class="stat-pill">
+        <span class="stat-label">Tổng mở:</span>
+        <strong id="history-total-count" class="stat-val">0</strong>
+      </div>
+      <div class="stat-pill stat-rare">
+        <span class="stat-label">Món hiếm (Hồng+):</span>
+        <strong id="history-rare-count" class="stat-val">0</strong>
+      </div>
+    </div>
+
+    <!-- Danh sách lịch sử -->
+    <div id="history-list" class="drawer-body history-items" role="feed"></div>
+
+    <div class="drawer-footer">
+      <button id="btn-clear-history" class="btn-danger-outline" type="button">
+        🗑️ Xóa toàn bộ lịch sử
+      </button>
+    </div>
+  </aside>
+
+  <!-- 5. TRONG HÒM CÓ GÌ? (CASE CONTENTS DRAWER) -->
+  <div id="case-backdrop" class="drawer-backdrop" aria-hidden="true"></div>
+  <aside id="case-drawer" class="drawer drawer-right" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Danh sách món trong hòm">
+    <div class="drawer-header">
+      <div class="drawer-title-row">
+        <span class="drawer-icon" aria-hidden="true">🔍</span>
+        <div>
+          <h2 class="drawer-title">Trong Hòm Có Gì?</h2>
+          <span id="case-eligible-count" class="drawer-subtitle">Đang tính toán...</span>
+        </div>
+      </div>
+      <button id="btn-close-case" class="btn-close-drawer" aria-label="Đóng xem trước">✕</button>
+    </div>
+
+    <!-- Danh sách món phân theo tier -->
+    <div id="case-tier-list" class="drawer-body case-content-body"></div>
+  </aside>
+
+  <!-- 6. DIALOG THÔNG BÁO POOL RỖNG -->
+  <div id="empty-pool-dialog" class="empty-dialog" role="alertdialog" aria-modal="true" aria-hidden="true">
+    <div class="empty-dialog-backdrop"></div>
+    <div class="empty-dialog-box">
+      <div class="empty-dialog-icon">🧐</div>
+      <h3 class="empty-dialog-title">Hòm chưa có món phù hợp!</h3>
+      <p id="empty-pool-msg" class="empty-dialog-text">
+        Với mức ngân sách này thì hơi khó kiếm đồ ăn no bụng...
+      </p>
+      <div class="empty-dialog-actions">
+        <button id="empty-btn-add-budget" class="btn-primary" type="button">
+          Tăng lên 35.000đ
+        </button>
+        <button id="empty-btn-switch-meal" class="btn-secondary" type="button">
+          Chuyển sang Ăn Vặt
+        </button>
+        <button id="empty-btn-close" class="btn-ghost" type="button">
+          Để tôi tự chỉnh lại
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vùng chứa các hiệu ứng lấp lánh và confetti -->
+  <div id="particles-overlay" class="particles-overlay" aria-hidden="true"></div>
+
+  <!-- Toast thông báo nhỏ -->
+  <div id="toast" class="toast-notification" role="status" aria-live="polite"></div>
+
+  <!-- Screen reader announcer -->
+  <div id="sr-announcer" class="sr-only" aria-live="polite"></div>
+</body>
+</html>
